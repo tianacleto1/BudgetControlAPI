@@ -1,0 +1,4 @@
+-------------------------------------------------------------------------------
+Test set: com.anacleto.budgetcontrolapi.BudgetcontrolApiApplicationTests
+-------------------------------------------------------------------------------
+Tests run: 1, Failures: 0, Errors: 0, Skipped: 0, Time elapsed: 15.304 s - in com.anacleto.budgetcontrolapi.BudgetcontrolApiApplicationTests
