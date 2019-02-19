@@ -1,1 +1,4 @@
-com\anacleto\budgetcontrolapi\BudgetcontrolApiApplication.class
+com\anacleto\budgetcontrol\api\BudgetcontrolApiApplication.class
+com\anacleto\budgetcontrol\api\model\Categoria.class
+com\anacleto\budgetcontrol\api\resource\CategoriaResource.class
+com\anacleto\budgetcontrol\api\repository\CategoriaRepository.class
