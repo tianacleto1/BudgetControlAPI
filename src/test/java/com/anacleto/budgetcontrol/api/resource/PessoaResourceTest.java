@@ -3,11 +3,14 @@ package com.anacleto.budgetcontrol.api.resource;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -27,13 +30,17 @@ import org.springframework.test.web.servlet.MockMvc;
 import com.anacleto.budgetcontrol.api.model.Endereco;
 import com.anacleto.budgetcontrol.api.model.Pessoa;
 import com.anacleto.budgetcontrol.api.repository.PessoaRepository;
+import com.anacleto.budgetcontrol.api.service.PessoaService;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest(PessoaResource.class)
+@WebMvcTest({ PessoaResource.class, PessoaService.class })
 public class PessoaResourceTest {
 	
 	@MockBean
 	private PessoaRepository mockRepository;
+	
+	@MockBean
+	private PessoaService mockService;
 	
 	@Autowired
 	private MockMvc mockMvc;
@@ -41,7 +48,7 @@ public class PessoaResourceTest {
 	@Autowired
 	private PessoaResource pessoaResource;
 	
-	private Pessoa pessoaMock = criaMockPessoa();
+	private final Pessoa pessoaMock = criaMockPessoa();
 	
 	@Test
 	public void getAllPessoasTest() {
@@ -57,9 +64,9 @@ public class PessoaResourceTest {
 	
 	@Test
 	public void whenGetPessoaByCodigoExistShouldReturnPessoaJsonTest() throws Exception {
-		when(mockRepository.findById(1L)).thenReturn(Optional.of(pessoaMock));
+		when(mockRepository.findById(anyLong())).thenReturn(Optional.of(pessoaMock));
 		
-		this.mockMvc.perform(get("/pessoas/{codigo}", "1")
+		this.mockMvc.perform(get("/pessoas/{codigo}", anyLong())
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isOk())
 						.andExpect(jsonPath("$.codigo", is(1)))
@@ -71,16 +78,16 @@ public class PessoaResourceTest {
 	
 	@Test
 	public void whenGetPessoaByCodigoDoesnotExistShouldReturnNoContentTest() throws Exception {
-		when(mockRepository.findById(1L)).thenReturn(Optional.empty());
+		when(mockRepository.findById(anyLong())).thenReturn(Optional.empty());
 		
-		this.mockMvc.perform(get("/pessoas/{codigo}", "0")
+		this.mockMvc.perform(get("/pessoas/{codigo}", anyLong())
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isNotFound());
 	}
 	
 	@Test
 	public void criarPessoaTest() throws Exception {
-		when(mockRepository.save(new Pessoa())).thenReturn(pessoaMock);
+		when(mockRepository.save(any())).thenReturn(pessoaMock);
 		
 		this.mockMvc.perform(post("/pessoas")
 						.content("{\"nome\" : \"Fulano\",\"ativo\" : \"false\"}")
@@ -92,12 +99,23 @@ public class PessoaResourceTest {
 	
 	@Test
 	public void removerPessoaTest() throws Exception {
-		doNothing().when(mockRepository).deleteById(1L);
+		doNothing().when(mockRepository).deleteById(anyLong());
 		
-		this.mockMvc.perform(delete("/pessoas/{codigo}", "1")
+		this.mockMvc.perform(delete("/pessoas/{codigo}", anyLong())
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isNoContent());
 	}
+	
+	
+	@Test
+	public void atualizarPessoaTest() throws Exception {
+		when(mockService.atualizar(anyLong(), any())).thenReturn(pessoaMock);
+		
+		this.mockMvc.perform(put("/pessoas/{codigo}", anyLong(), any())
+						.content("{\"nome\" : \"Fulano\",\"ativo\" : \"false\"}")
+						.contentType(MediaType.APPLICATION_JSON))
+						.andExpect(status().isOk());
+	} 
 	
 	private Pessoa criaMockPessoa() {
 		Pessoa pessoaMock = new Pessoa();

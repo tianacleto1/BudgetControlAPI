@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
@@ -22,25 +23,29 @@ import org.springframework.web.bind.annotation.RestController;
 import com.anacleto.budgetcontrol.api.event.RecursoCriadoEvent;
 import com.anacleto.budgetcontrol.api.model.Pessoa;
 import com.anacleto.budgetcontrol.api.repository.PessoaRepository;
+import com.anacleto.budgetcontrol.api.service.PessoaService;
 
 @RestController
 @RequestMapping("/pessoas")
 public class PessoaResource {
 
 	@Autowired
-	private PessoaRepository pessoaRespository;
+	private PessoaRepository pessoaRepository;
+	
+	@Autowired
+	PessoaService pessoaService;
 	
 	@Autowired
 	private ApplicationEventPublisher publisher;
 	
 	@GetMapping
 	public List<Pessoa> listarPessoas() {
-		return pessoaRespository.findAll();
+		return pessoaRepository.findAll();
 	}
 	
 	@PostMapping
 	public ResponseEntity<Pessoa> criarPessoa(@Valid @RequestBody Pessoa pessoa, HttpServletResponse response) {
-		Pessoa pessoaSalva = pessoaRespository.save(pessoa);
+		Pessoa pessoaSalva = pessoaRepository.save(pessoa);
 		
 		publisher.publishEvent(new RecursoCriadoEvent(this, response, pessoaSalva.getCodigo()));
 
@@ -49,7 +54,7 @@ public class PessoaResource {
 	
 	@GetMapping("/{codigo}")
 	public ResponseEntity<Pessoa> getPessoaById(@PathVariable Long codigo) {
-		Optional<Pessoa> pessoaOp = pessoaRespository.findById(codigo);
+		Optional<Pessoa> pessoaOp = pessoaRepository.findById(codigo);
 		
 		return pessoaOp.isPresent() ? ResponseEntity.ok().body(pessoaOp.get())
 									: ResponseEntity.notFound().build();
@@ -58,6 +63,11 @@ public class PessoaResource {
 	@DeleteMapping("/{codigo}")
 	@ResponseStatus(HttpStatus.NO_CONTENT)
 	public void removerPessoa(@PathVariable Long codigo) {
-		pessoaRespository.deleteById(codigo);
+		pessoaRepository.deleteById(codigo);
+	}
+	
+	@PutMapping("/{codigo}")
+	public ResponseEntity<Pessoa> atualizarPessoa(@PathVariable Long codigo, @Valid @RequestBody Pessoa pessoa) {	
+		return ResponseEntity.ok(pessoaService.atualizar(codigo, pessoa));
 	}
 }
