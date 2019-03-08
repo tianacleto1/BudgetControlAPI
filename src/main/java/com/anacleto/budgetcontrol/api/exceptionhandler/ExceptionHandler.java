@@ -29,7 +29,7 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
 										    HttpHeaders headers, HttpStatus status, WebRequest request) {
 				
 		String userMessage = messageSource.getMessage("mensagem.invalida", null, LocaleContextHolder.getLocale());
-		String devMessage = ex.getCause().toString();
+		String devMessage = ex.getCause() != null ? ex.getCause().toString() : ex.toString();
 		
 		List<Error> errors = Arrays.asList(new Error(userMessage, devMessage));
 		

@@ -14,7 +14,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -27,8 +27,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.anacleto.budgetcontrol.api.model.Endereco;
 import com.anacleto.budgetcontrol.api.model.Pessoa;
+import com.anacleto.budgetcontrol.api.model.PessoaMock;
 import com.anacleto.budgetcontrol.api.repository.PessoaRepository;
 import com.anacleto.budgetcontrol.api.service.PessoaService;
 
@@ -48,12 +48,11 @@ public class PessoaResourceTest {
 	@Autowired
 	private PessoaResource pessoaResource;
 	
-	private final Pessoa pessoaMock = criaMockPessoa();
+	private final Pessoa pessoaMock = PessoaMock.criaMockPessoa();
 	
 	@Test
 	public void getAllPessoasTest() {
-		List<Pessoa> pessoas = new ArrayList<>();
-		pessoas.add(pessoaMock);
+		List<Pessoa> pessoas = Arrays.asList(pessoaMock);
 		
 		when(mockRepository.findAll()).thenReturn(pessoas);
 		Pessoa pessoaTest = pessoaResource.listarPessoas().get(0);
@@ -117,23 +116,13 @@ public class PessoaResourceTest {
 						.andExpect(status().isOk());
 	} 
 	
-	private Pessoa criaMockPessoa() {
-		Pessoa pessoaMock = new Pessoa();
-		pessoaMock.setCodigo(1L);
-		pessoaMock.setNome("NomeTest");
-		pessoaMock.setAtivo(Boolean.FALSE);
+	@Test
+	public void atualizarPropriedadeAtivoTest() throws Exception {
+		doNothing().when(mockService).atualizarPropriedadeAtivo(anyLong(), any());
 		
-		Endereco enderecoMock = new Endereco();
-		enderecoMock.setLogradouro("LogradouroTest");
-		enderecoMock.setNumero("numeroTest");
-		enderecoMock.setComplemento("complementoTest");
-		enderecoMock.setBairro("bairroTest");
-		enderecoMock.setCep("cepTest");
-		enderecoMock.setCidade("cidadeTest");
-		enderecoMock.setCidade("cidadeTest");
-		
-		pessoaMock.setEndereco(enderecoMock);
-		
-		return pessoaMock;
+		this.mockMvc.perform(put("/pessoas/{codigo}/ativo", anyLong(), any())
+						.content("true")
+						.contentType(MediaType.APPLICATION_JSON))
+						.andExpect(status().isNoContent());
 	}
 }

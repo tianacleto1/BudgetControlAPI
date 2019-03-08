@@ -2,7 +2,9 @@ package com.anacleto.budgetcontrol.api.service;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 
@@ -16,8 +18,8 @@ import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.test.context.junit4.SpringRunner;
 
-import com.anacleto.budgetcontrol.api.model.Endereco;
 import com.anacleto.budgetcontrol.api.model.Pessoa;
+import com.anacleto.budgetcontrol.api.model.PessoaMock;
 import com.anacleto.budgetcontrol.api.repository.PessoaRepository;
 
 @RunWith(SpringRunner.class)
@@ -30,10 +32,10 @@ public class PessoaServiceTest {
 	@Autowired
 	private PessoaService mockService;
 	
+	private Pessoa pessoaMock = PessoaMock.criaMockPessoa();
+	
 	@Test
 	public void whenUpdatePessoaIsOkShouldReturnEntityPessoaUpdatedTest() {
-		Pessoa pessoaMock = criaMockPessoa();
-		
 		when(mockRepository.findById(anyLong())).thenReturn(Optional.of(pessoaMock));
 		when(mockRepository.save(pessoaMock)).thenReturn(pessoaMock);
 		
@@ -56,24 +58,13 @@ public class PessoaServiceTest {
 		}
 	}
 	
-	private Pessoa criaMockPessoa() {
-		Pessoa pessoaMock = new Pessoa();
-		pessoaMock.setCodigo(1L);
-		pessoaMock.setNome("NomeTest");
-		pessoaMock.setAtivo(Boolean.FALSE);
+	@Test
+	public void whenPessoaExistAndAtivoIsFalseShouldSetToTrueTest() {
+		when(mockRepository.findById(anyLong())).thenReturn(Optional.of(pessoaMock));
+		when(mockRepository.save(any())).thenReturn(pessoaMock);
 		
-		Endereco enderecoMock = new Endereco();
-		enderecoMock.setLogradouro("LogradouroTest");
-		enderecoMock.setNumero("numeroTest");
-		enderecoMock.setComplemento("complementoTest");
-		enderecoMock.setBairro("bairroTest");
-		enderecoMock.setCep("cepTest");
-		enderecoMock.setCidade("cidadeTest");
-		enderecoMock.setCidade("cidadeTest");
+		mockService.atualizarPropriedadeAtivo(pessoaMock.getCodigo(), true);
 		
-		pessoaMock.setEndereco(enderecoMock);
-		
-		return pessoaMock;
+		assertTrue(pessoaMock.getAtivo());
 	}
-
 }
