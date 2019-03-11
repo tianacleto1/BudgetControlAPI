@@ -13,10 +13,10 @@ CREATE TABLE lancamento (
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
 INSERT INTO lancamento (descricao, data_vencimento, data_pagamento, valor, observacao, tipo, codigo_categoria, codigo_pessoa)
-     VALUES ('Salário Mensal', '2017-06-10', null, 6500.00, 'Distribuição de Lucros', 'Receita', 5, 1);
+     VALUES ('Salário Mensal', '2017-06-10', null, 6500.00, 'Distribuição de Lucros', 'RECEITA', 5, 1);
 INSERT INTO lancamento (descricao, data_vencimento, data_pagamento, valor, observacao, tipo, codigo_categoria, codigo_pessoa)
-     VALUES ('Supermercado', '2017-02-10', '2017-02-10', 100.32, null, 'Despesa', 3, 2);
+     VALUES ('Supermercado', '2017-02-10', '2017-02-10', 100.32, null, 'DESPESA', 3, 2);
 INSERT INTO lancamento (descricao, data_vencimento, data_pagamento, valor, observacao, tipo, codigo_categoria, codigo_pessoa)
-     VALUES ('Top Club', '2017-06-10', null, 120, null, 'Receita', 5, 3);
+     VALUES ('Top Club', '2017-06-10', null, 120, null, 'RECEITA', 5, 3);
 INSERT INTO lancamento (descricao, data_vencimento, data_pagamento, valor, observacao, tipo, codigo_categoria, codigo_pessoa)
-     VALUES ('CPFL', '2017-02-11', '2017-02-11', 110.44, 'Conta de Luz', 'Despesa', 5, 4);
+     VALUES ('CPFL', '2017-02-11', '2017-02-11', 110.44, 'Conta de Luz', 'DESPESA', 5, 4);

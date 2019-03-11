@@ -7,7 +7,7 @@ public enum TipoLancamento {
 	
 	private final String nome;
 	
-	private TipoLancamento(String nome) {
+	TipoLancamento(String nome) {
 		this.nome = nome;
 	}
 
