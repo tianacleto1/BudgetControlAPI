@@ -29,13 +29,18 @@ import com.anacleto.budgetcontrol.api.model.Lancamento;
 import com.anacleto.budgetcontrol.api.model.Pessoa;
 import com.anacleto.budgetcontrol.api.model.TipoLancamento;
 import com.anacleto.budgetcontrol.api.repository.LancamentoRepository;
+import com.anacleto.budgetcontrol.api.repository.PessoaRepository;
+import com.anacleto.budgetcontrol.api.service.LancamentoService;
 
 @RunWith(SpringRunner.class)
-@WebMvcTest({ LancamentoResource.class })
+@WebMvcTest({ LancamentoResource.class, LancamentoService.class, PessoaRepository.class })
 public class LancamentoResourceTest {
 
 	@MockBean
 	private LancamentoRepository mockRepository;
+	
+	@MockBean 
+	private LancamentoService mockService;
 	
 	@Autowired
 	private MockMvc mockMvc;
@@ -47,9 +52,9 @@ public class LancamentoResourceTest {
 	
 	@Test
 	public void getAllLancamentosTest() {
-		when(mockRepository.findAll()).thenReturn(Arrays.asList(criaMockLancamento()));
+		when(mockRepository.findAll()).thenReturn(Arrays.asList(lancamentoMock));
 		
-		Lancamento lancamentoTest = lancamentoResource.listarLancamentos().get(0);
+		Lancamento lancamentoTest = lancamentoResource.getAllLancamentos().get(0);
 		
 		assertEquals("descricaoTest", lancamentoTest.getDescricao());
 		assertTrue(lancamentoTest.getPessoa().getAtivo());
@@ -74,7 +79,7 @@ public class LancamentoResourceTest {
 		this.mockMvc.perform(get("/lancamentos/{codigo}", anyLong())
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isNotFound());
-	}
+	} 
 	
 	private Lancamento criaMockLancamento() {
 		Lancamento lancamentoMock = new Lancamento();

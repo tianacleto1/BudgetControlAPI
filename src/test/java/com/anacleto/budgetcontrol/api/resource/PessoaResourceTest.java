@@ -16,13 +16,13 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 import java.util.Arrays;
 import java.util.List;
-import java.util.Optional;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -63,7 +63,7 @@ public class PessoaResourceTest {
 	
 	@Test
 	public void whenGetPessoaByCodigoExistShouldReturnPessoaJsonTest() throws Exception {
-		when(mockRepository.findById(anyLong())).thenReturn(Optional.of(pessoaMock));
+		when(mockService.buscarPessoaByCodigo(anyLong())).thenReturn(pessoaMock);
 		
 		this.mockMvc.perform(get("/pessoas/{codigo}", anyLong())
 						.contentType(MediaType.APPLICATION_JSON))
@@ -76,10 +76,10 @@ public class PessoaResourceTest {
 	}
 	
 	@Test
-	public void whenGetPessoaByCodigoDoesnotExistShouldReturnNoContentTest() throws Exception {
-		when(mockRepository.findById(anyLong())).thenReturn(Optional.empty());
+	public void whenGetPessoaByCodigoDoesnotExistShouldThrowEmptyResultDataAccessExceptionAndReturnNoContentTest() throws Exception {
+		when(mockService.buscarPessoaByCodigo(anyLong())).thenThrow(EmptyResultDataAccessException.class);
 		
-		this.mockMvc.perform(get("/pessoas/{codigo}", anyLong())
+		this.mockMvc.perform(get("/pessoas/{codigo}", -1)
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isNotFound());
 	}

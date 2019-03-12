@@ -1,13 +1,13 @@
 package com.anacleto.budgetcontrol.api.resource;
 
 import java.util.List;
-import java.util.Optional;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.validation.Valid;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
@@ -53,11 +53,12 @@ public class PessoaResource {
 	}
 	
 	@GetMapping("/{codigo}")
-	public ResponseEntity<Pessoa> getPessoaById(@PathVariable Long codigo) {
-		Optional<Pessoa> pessoaOp = pessoaRepository.findById(codigo);
-		
-		return pessoaOp.isPresent() ? ResponseEntity.ok().body(pessoaOp.get())
-									: ResponseEntity.notFound().build();
+	public ResponseEntity<Pessoa> getPessoaByCodigo(@PathVariable Long codigo) {
+		try {
+			return ResponseEntity.ok().body(pessoaService.buscarPessoaByCodigo(codigo));
+		} catch (EmptyResultDataAccessException ex) {
+			return ResponseEntity.notFound().build();
+		}
 	}
 	
 	@DeleteMapping("/{codigo}")
