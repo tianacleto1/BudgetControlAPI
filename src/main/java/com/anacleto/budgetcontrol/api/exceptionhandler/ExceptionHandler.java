@@ -20,6 +20,8 @@ import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.context.request.WebRequest;
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler;
 
+import com.anacleto.budgetcontrol.api.service.exception.PessoaInexistenteOuInativaException;
+
 @ControllerAdvice
 public class ExceptionHandler extends ResponseEntityExceptionHandler {
 
@@ -65,6 +67,16 @@ public class ExceptionHandler extends ResponseEntityExceptionHandler {
 		List<Error> errors = Arrays.asList(new Error(userMessage, devMessage));
 		
 		return handleExceptionInternal(ex, errors, new HttpHeaders(), HttpStatus.BAD_REQUEST, request);
+	}
+	
+	@org.springframework.web.bind.annotation.ExceptionHandler({ PessoaInexistenteOuInativaException.class })
+	public ResponseEntity<Object> handlePessoaInexistenteOuInativaException(PessoaInexistenteOuInativaException ex) {
+		String userMessage = messageSource.getMessage("pessoa.inexistente-ou-inativa", null, LocaleContextHolder.getLocale());
+		String devMessage = ex.toString();
+		
+		List<Error> errors = Arrays.asList(new Error(userMessage, devMessage));
+		
+		return ResponseEntity.badRequest().body(errors);
 	}
 	
 	private List<Error> createErrorList(BindingResult bindingResult) {

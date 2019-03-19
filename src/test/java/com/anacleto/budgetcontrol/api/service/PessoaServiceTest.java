@@ -1,7 +1,6 @@
 package com.anacleto.budgetcontrol.api.service;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
@@ -43,7 +42,7 @@ public class PessoaServiceTest {
 		
 		assertEquals(new Long(1), pessoaMock.getCodigo());
 		assertEquals("NomeTest", pessoaMock.getNome());
-		assertFalse(pessoaMock.getAtivo());
+		assertTrue(pessoaMock.getAtivo());
 	}
 	
 	@Test

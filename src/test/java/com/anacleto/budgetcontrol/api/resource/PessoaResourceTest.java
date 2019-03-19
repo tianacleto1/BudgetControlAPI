@@ -2,7 +2,7 @@ package com.anacleto.budgetcontrol.api.resource;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
@@ -58,7 +58,7 @@ public class PessoaResourceTest {
 		Pessoa pessoaTest = pessoaResource.listarPessoas().get(0);
 		
 		assertEquals("NomeTest", pessoaTest.getNome());
-		assertFalse(pessoaTest.getAtivo());
+		assertTrue(pessoaTest.getAtivo());
 	}
 	
 	@Test
@@ -70,7 +70,7 @@ public class PessoaResourceTest {
 						.andExpect(status().isOk())
 						.andExpect(jsonPath("$.codigo", is(1)))
 						.andExpect(jsonPath("$.nome", is(pessoaMock.getNome())))
-						.andExpect(jsonPath("$.ativo", is(Boolean.FALSE)))
+						.andExpect(jsonPath("$.ativo", is(Boolean.TRUE)))
 						.andExpect(jsonPath("$.endereco.logradouro", is(pessoaMock.getEndereco()
 																			      .getLogradouro())));
 	}
@@ -93,7 +93,7 @@ public class PessoaResourceTest {
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isCreated())
 						.andExpect(jsonPath("$.nome", is(pessoaMock.getNome())))
-						.andExpect(jsonPath("$.ativo", is(Boolean.FALSE)));
+						.andExpect(jsonPath("$.ativo", is(Boolean.TRUE)));
 	}
 	
 	@Test

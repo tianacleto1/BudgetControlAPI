@@ -6,7 +6,7 @@ public class PessoaMock {
 		Pessoa pessoaMock = new Pessoa();
 		pessoaMock.setCodigo(1L);
 		pessoaMock.setNome("NomeTest");
-		pessoaMock.setAtivo(Boolean.FALSE);
+		pessoaMock.setAtivo(Boolean.TRUE);
 		
 		Endereco enderecoMock = new Endereco();
 		enderecoMock.setLogradouro("LogradouroTest");

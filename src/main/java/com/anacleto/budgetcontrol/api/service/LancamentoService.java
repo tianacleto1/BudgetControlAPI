@@ -20,7 +20,7 @@ public class LancamentoService {
 	@Autowired
 	private LancamentoRepository lancamentoRepository;
 	
-	public Lancamento salvar(Lancamento lancamento) throws PessoaInexistenteOuInativaException {
+	public Lancamento salvar(Lancamento lancamento) {
 		Optional<Pessoa> pessoaOp = pessoaRespository.findById(lancamento.getPessoa().getCodigo());
 		 
 		if (!pessoaOp.isPresent() || !pessoaOp.get().isInativo()) {

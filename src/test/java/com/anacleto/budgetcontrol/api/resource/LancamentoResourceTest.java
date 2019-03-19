@@ -3,16 +3,18 @@ package com.anacleto.budgetcontrol.api.resource;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.Arrays;
 import java.util.Optional;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -23,11 +25,8 @@ import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
-import com.anacleto.budgetcontrol.api.model.Categoria;
-import com.anacleto.budgetcontrol.api.model.Endereco;
 import com.anacleto.budgetcontrol.api.model.Lancamento;
-import com.anacleto.budgetcontrol.api.model.Pessoa;
-import com.anacleto.budgetcontrol.api.model.TipoLancamento;
+import com.anacleto.budgetcontrol.api.model.LancamentoMock;
 import com.anacleto.budgetcontrol.api.repository.LancamentoRepository;
 import com.anacleto.budgetcontrol.api.repository.PessoaRepository;
 import com.anacleto.budgetcontrol.api.service.LancamentoService;
@@ -42,13 +41,16 @@ public class LancamentoResourceTest {
 	@MockBean 
 	private LancamentoService mockService;
 	
+	@MockBean
+	private HttpServletResponse response;
+	
 	@Autowired
 	private MockMvc mockMvc;
 	
 	@Autowired
 	private LancamentoResource lancamentoResource;
 	
-	private Lancamento lancamentoMock = criaMockLancamento();
+	private Lancamento lancamentoMock = LancamentoMock.criaMockLancamento();
 	
 	@Test
 	public void getAllLancamentosTest() {
@@ -81,37 +83,30 @@ public class LancamentoResourceTest {
 						.andExpect(status().isNotFound());
 	} 
 	
-	private Lancamento criaMockLancamento() {
-		Lancamento lancamentoMock = new Lancamento();
-		lancamentoMock.setCodigo(2L);
-		lancamentoMock.setDescricao("descricaoTest");
-		lancamentoMock.setDataVencimento(LocalDate.of(2017, 2, 9));
-		lancamentoMock.setDataPagamento(LocalDate.of(2017, 2, 9));
-		lancamentoMock.setValor(new BigDecimal(100.32));
-		lancamentoMock.setTipo(TipoLancamento.DESPESA);
+	@Test
+	public void criarLancamentoMockMvcTest() throws Exception {
+		when(mockService.salvar(any())).thenReturn(lancamentoMock);
 		
-		Categoria categoriaMock = new Categoria();
-		categoriaMock.setCodigo(2L);
-		categoriaMock.setNome("Supermercado");
+		this.mockMvc.perform(post("/lancamentos")
+						.content("{\"descricao\" : \"Test\","
+								+ "\"dataVencimento\" : \"2019-04-10\","
+								+ "\"valor\" : \"1000.0\","
+								+ "\"tipo\" : \"RECEITA\","
+								+ "\"categoria\" : {\"codigo\" : \"5\"},"
+								+ "\"pessoa\" : {\"codigo\" : \"1\"}}")
+						.contentType(MediaType.APPLICATION_JSON))
+						.andExpect(status().isCreated())
+						.andExpect(jsonPath("$.descricao", is(lancamentoMock.getDescricao())))
+						.andExpect(jsonPath("$.valor", is(lancamentoMock.getValor())));
+	} 
+	
+	@Test
+	public void craiLancamentoTest() {
+		when(mockService.salvar(any())).thenReturn(lancamentoMock);
 		
-		lancamentoMock.setCategoria(categoriaMock);
+		lancamentoResource.criarLancamento(lancamentoMock, response);
 		
-		Pessoa pessoaMock = new Pessoa();
-		pessoaMock.setCodigo(2L);
-		pessoaMock.setNome("nomeTest");
-		Endereco enderecoMock = new Endereco();
-		enderecoMock.setLogradouro("logradouroTest");
-		enderecoMock.setNumero("100");
-		enderecoMock.setBairro("bairroTest");
-		enderecoMock.setCep("cepTest");
-		enderecoMock.setCidade("cidadeTest");
-		enderecoMock.setEstado("estadoTest");
-		
-		pessoaMock.setEndereco(enderecoMock);
-		pessoaMock.setAtivo(true);
-		
-		lancamentoMock.setPessoa(pessoaMock);
-		
-		return lancamentoMock;
-	}
+		assertEquals("descricaoTest", lancamentoMock.getDescricao());
+		assertTrue(lancamentoMock.getPessoa().getAtivo());
+	} 
 }
