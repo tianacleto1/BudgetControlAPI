@@ -2,10 +2,15 @@ package com.anacleto.budgetcontrol.api.resource;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -21,6 +26,7 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -115,12 +121,34 @@ public class LancamentoResourceTest {
 	} 
 	
 	@Test
-	public void craiLancamentoTest() {
+	public void criaLancamentoTest() {
 		when(mockService.salvar(any())).thenReturn(lancamentoMock);
 		
 		lancamentoResource.criarLancamento(lancamentoMock, response);
 		
 		assertEquals("descricaoTest", lancamentoMock.getDescricao());
 		assertTrue(lancamentoMock.getPessoa().getAtivo());
-	} 
+	}
+	
+	@Test
+	public void whenRemoveLancamentoIsCalledWithCodigoThatDoesntExist_ThenItShouldThrowEmptyResultDataAccessExceptionTest() throws Exception {
+		doThrow(EmptyResultDataAccessException.class).when(mockRepository).deleteById(anyLong());
+		
+		try {
+			lancamentoResource.removerLancamento(-1L);
+			
+			fail("It Should throws EmptyResultDataAccessException");
+		} catch (EmptyResultDataAccessException e) {
+			assertSame(EmptyResultDataAccessException.class, e.getClass());
+		}
+	}
+	
+	@Test
+	public void whenRemoveLancamentoIsCalledWithCodigoThatExist_ThenItShouldBeRemovedSuccessfullyTest() throws Exception {
+		doNothing().when(mockRepository).deleteById(anyLong());
+		
+		this.mockMvc.perform(delete("/lancamentos/{codigo}", anyLong())
+						.contentType(MediaType.APPLICATION_JSON))
+						.andExpect(status().isNoContent());
+	}
 }

@@ -105,7 +105,6 @@ public class PessoaResourceTest {
 						.andExpect(status().isNoContent());
 	}
 	
-	
 	@Test
 	public void atualizarPessoaTest() throws Exception {
 		when(mockService.atualizar(anyLong(), any())).thenReturn(pessoaMock);
