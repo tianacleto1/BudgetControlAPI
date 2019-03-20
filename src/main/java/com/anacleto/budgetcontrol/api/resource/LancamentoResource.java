@@ -20,6 +20,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.anacleto.budgetcontrol.api.event.RecursoCriadoEvent;
 import com.anacleto.budgetcontrol.api.model.Lancamento;
 import com.anacleto.budgetcontrol.api.repository.LancamentoRepository;
+import com.anacleto.budgetcontrol.api.repository.filter.LancamentoFilter;
 import com.anacleto.budgetcontrol.api.service.LancamentoService;
 
 @RestController
@@ -36,8 +37,8 @@ public class LancamentoResource {
 	private ApplicationEventPublisher publisher;
 	
 	@GetMapping
-	public List<Lancamento> getAllLancamentos() {
-		return lancamentoRepository.findAll();
+	public List<Lancamento> pesquisarLancamento(LancamentoFilter lancamentoFilter) {
+		return lancamentoRepository.filtrar(lancamentoFilter);
 	}
 	
 	@GetMapping("/{codigo}")

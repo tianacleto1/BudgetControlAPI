@@ -29,6 +29,7 @@ import com.anacleto.budgetcontrol.api.model.Lancamento;
 import com.anacleto.budgetcontrol.api.model.LancamentoMock;
 import com.anacleto.budgetcontrol.api.repository.LancamentoRepository;
 import com.anacleto.budgetcontrol.api.repository.PessoaRepository;
+import com.anacleto.budgetcontrol.api.repository.filter.LancamentoFilter;
 import com.anacleto.budgetcontrol.api.service.LancamentoService;
 
 @RunWith(SpringRunner.class)
@@ -54,9 +55,22 @@ public class LancamentoResourceTest {
 	
 	@Test
 	public void getAllLancamentosTest() {
-		when(mockRepository.findAll()).thenReturn(Arrays.asList(lancamentoMock));
+		when(mockRepository.filtrar(any())).thenReturn(Arrays.asList(lancamentoMock));
 		
-		Lancamento lancamentoTest = lancamentoResource.getAllLancamentos().get(0);
+		Lancamento lancamentoTest = lancamentoResource.pesquisarLancamento(any()).get(0);
+		
+		assertEquals("descricaoTest", lancamentoTest.getDescricao());
+		assertTrue(lancamentoTest.getPessoa().getAtivo());
+	}
+	
+	@Test
+	public void getLancamentoByDescricaoTest() {
+		LancamentoFilter filter = new LancamentoFilter();
+		filter.setDescricao("descricaoTest");
+		
+		when(mockRepository.filtrar(any())).thenReturn(Arrays.asList(lancamentoMock));
+		
+		Lancamento lancamentoTest = lancamentoResource.pesquisarLancamento(filter).get(0);
 		
 		assertEquals("descricaoTest", lancamentoTest.getDescricao());
 		assertTrue(lancamentoTest.getPessoa().getAtivo());
