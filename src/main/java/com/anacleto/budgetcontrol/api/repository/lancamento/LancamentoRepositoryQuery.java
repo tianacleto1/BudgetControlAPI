@@ -1,11 +1,12 @@
 package com.anacleto.budgetcontrol.api.repository.lancamento;
 
-import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 
 import com.anacleto.budgetcontrol.api.model.Lancamento;
 import com.anacleto.budgetcontrol.api.repository.filter.LancamentoFilter;
 
 public interface LancamentoRepositoryQuery {
 
-	List<Lancamento> filtrar(LancamentoFilter lancamentoFilter);
+	Page<Lancamento> filtrar(LancamentoFilter lancamentoFilter, Pageable pageable);
 }

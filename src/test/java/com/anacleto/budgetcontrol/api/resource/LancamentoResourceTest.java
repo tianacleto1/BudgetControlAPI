@@ -27,6 +27,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -49,24 +51,28 @@ public class LancamentoResourceTest {
 	private LancamentoService mockService;
 	
 	@MockBean
-	private HttpServletResponse response;
+	private org.springframework.data.domain.Pageable pageable;
 	
+	@MockBean
+	private HttpServletResponse response;
+
 	@Autowired
 	private MockMvc mockMvc;
 	
 	@Autowired
 	private LancamentoResource lancamentoResource;
 	
-	private Lancamento lancamentoMock = LancamentoMock.criaMockLancamento();
+	private final Lancamento lancamentoMock = LancamentoMock.criaMockLancamento();
+	private final Page<Lancamento> pageImpl = new PageImpl<>(Arrays.asList(lancamentoMock));
 	
 	@Test
 	public void getAllLancamentosTest() {
-		when(mockRepository.filtrar(any())).thenReturn(Arrays.asList(lancamentoMock));
+		when(mockRepository.filtrar(any(), any())).thenReturn(pageImpl);
 		
-		Lancamento lancamentoTest = lancamentoResource.pesquisarLancamento(any()).get(0);
+		Page<Lancamento> lancamentoTest = lancamentoResource.pesquisarLancamento(any(), any());
 		
-		assertEquals("descricaoTest", lancamentoTest.getDescricao());
-		assertTrue(lancamentoTest.getPessoa().getAtivo());
+		assertEquals("descricaoTest", lancamentoTest.getContent().get(0).getDescricao());
+		assertTrue(lancamentoTest.getContent().get(0).getPessoa().getAtivo());
 	}
 	
 	@Test
@@ -74,12 +80,12 @@ public class LancamentoResourceTest {
 		LancamentoFilter filter = new LancamentoFilter();
 		filter.setDescricao("descricaoTest");
 		
-		when(mockRepository.filtrar(any())).thenReturn(Arrays.asList(lancamentoMock));
+		when(mockRepository.filtrar(any(), any())).thenReturn(pageImpl);
 		
-		Lancamento lancamentoTest = lancamentoResource.pesquisarLancamento(filter).get(0);
+		Page<Lancamento> lancamentoTest = lancamentoResource.pesquisarLancamento(filter, pageable);
 		
-		assertEquals("descricaoTest", lancamentoTest.getDescricao());
-		assertTrue(lancamentoTest.getPessoa().getAtivo());
+		assertEquals("descricaoTest", lancamentoTest.getContent().get(0).getDescricao());
+		assertTrue(lancamentoTest.getContent().get(0).getPessoa().getAtivo());
 	}
 	
 	@Test

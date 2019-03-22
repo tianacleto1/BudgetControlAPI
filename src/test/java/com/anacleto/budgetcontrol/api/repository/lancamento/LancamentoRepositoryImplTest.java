@@ -17,6 +17,9 @@ import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.test.context.junit4.SpringRunner;
 
 import com.anacleto.budgetcontrol.api.model.Lancamento;
@@ -45,24 +48,22 @@ public class LancamentoRepositoryImplTest {
 	@Autowired
 	private LancamentoRepositoryImpl repository;
 	
-	private Lancamento lancamentoMock = LancamentoMock.criaMockLancamento();
+	private final Lancamento lancamentoMock = LancamentoMock.criaMockLancamento();
+	@SuppressWarnings("deprecation")
+	private final Pageable pageable = new PageRequest(0, 1);
 	
 	@Test
 	public void whenSearchIsFilteredByDescriptionThatExistsItShouldReturnOkTest() {
-		when(em.getCriteriaBuilder()).thenReturn(builder);
-		when(builder.createQuery(Lancamento.class)).thenReturn(criteria);
-		when(criteria.from(Lancamento.class)).thenReturn(root);
-		when(em.createQuery(criteria)).thenReturn(query);
 		when(query.getResultList()).thenReturn(Arrays.asList(lancamentoMock));
 		
 		LancamentoFilter filter = new LancamentoFilter();
 		filter.setDescricao("descricaoTest");
-
-		Lancamento lancamento = repository.filtrar(filter).get(0);
 		
-		assertEquals("descricaoTest", lancamento.getDescricao());
+		Page<Lancamento> lancamentosPage = repository.filtrar(filter, pageable);
+		
+		assertEquals("descricaoTest", lancamentosPage.getContent().get(0).getDescricao());
 	}
-	
+
 	@Test
 	public void whenSearchIsFilteredByDataVencimentoDeItShouldReturnAllLancamentosFromThatDateAheadTest() {
 		when(em.getCriteriaBuilder()).thenReturn(builder);
@@ -74,9 +75,9 @@ public class LancamentoRepositoryImplTest {
 		LancamentoFilter filter = new LancamentoFilter();
 		filter.setDataVencimentoDe(LocalDate.of(2017, 01, 01));
 
-		Lancamento lancamento = repository.filtrar(filter).get(0);
+		Page<Lancamento> lancamentosPage = repository.filtrar(filter, pageable);
 		
-		assertEquals("Outros", lancamento.getCategoria().getNome());
+		assertEquals("Outros", lancamentosPage.getContent().get(0).getCategoria().getNome());
 	}
 	
 	@Test
@@ -91,8 +92,8 @@ public class LancamentoRepositoryImplTest {
 		filter.setDataVencimentoDe(LocalDate.of(2017, 02, 10));
 		filter.setDataVencimentoAte(LocalDate.of(2017, 06, 15));
 
-		Lancamento lancamento = repository.filtrar(filter).get(0);
+		Page<Lancamento> lancamentosPage = repository.filtrar(filter, pageable);
 		
-		assertEquals("Outros", lancamento.getCategoria().getNome());
+		assertEquals("Outros", lancamentosPage.getContent().get(0).getCategoria().getNome());
 	}
 }
