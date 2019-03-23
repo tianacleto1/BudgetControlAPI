@@ -30,6 +30,7 @@ import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
@@ -42,6 +43,7 @@ import com.anacleto.budgetcontrol.api.service.LancamentoService;
 
 @RunWith(SpringRunner.class)
 @WebMvcTest({ LancamentoResource.class, LancamentoService.class, PessoaRepository.class })
+@WithMockUser
 public class LancamentoResourceTest {
 
 	@MockBean
@@ -87,7 +89,7 @@ public class LancamentoResourceTest {
 		assertEquals("descricaoTest", lancamentoTest.getContent().get(0).getDescricao());
 		assertTrue(lancamentoTest.getContent().get(0).getPessoa().getAtivo());
 	}
-	
+
 	@Test
 	public void whenGetLancamentoByCodigoExistShouldReturnLancamentoJsonTest() throws Exception {
 		when(mockRepository.findById(anyLong())).thenReturn(Optional.of(lancamentoMock));
