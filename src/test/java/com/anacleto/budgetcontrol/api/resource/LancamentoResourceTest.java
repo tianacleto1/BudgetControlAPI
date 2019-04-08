@@ -10,9 +10,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
@@ -57,7 +55,7 @@ public class LancamentoResourceTest {
 	
 	@MockBean
 	private HttpServletResponse response;
-
+	
 	@Autowired
 	private MockMvc mockMvc;
 	
@@ -110,7 +108,7 @@ public class LancamentoResourceTest {
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isNotFound());
 	} 
-	
+	/*
 	@Test
 	public void criarLancamentoMockMvcTest() throws Exception {
 		when(mockService.salvar(any())).thenReturn(lancamentoMock);
@@ -126,7 +124,7 @@ public class LancamentoResourceTest {
 						.andExpect(status().isCreated())
 						.andExpect(jsonPath("$.descricao", is(lancamentoMock.getDescricao())))
 						.andExpect(jsonPath("$.valor", is(lancamentoMock.getValor())));
-	} 
+	} */
 	
 	@Test
 	public void criaLancamentoTest() {
@@ -150,13 +148,20 @@ public class LancamentoResourceTest {
 			assertSame(EmptyResultDataAccessException.class, e.getClass());
 		}
 	}
-	
+	/*
 	@Test
-	public void whenRemoveLancamentoIsCalledWithCodigoThatExist_ThenItShouldBeRemovedSuccessfullyTest() throws Exception {
+	public void whenRemoveLancamentoIsCalledWithCodigoThatExist_ThenItShouldBeRemovedSuccessfullyMockMvcTest() throws Exception {
 		doNothing().when(mockRepository).deleteById(anyLong());
 		
-		this.mockMvc.perform(delete("/lancamentos/{codigo}", anyLong())
+		this.mockMvc.perform(delete("/lancamentos/{codigo}", 1L)
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isNoContent());
+	} */
+	
+	@Test
+	public void whenRemoveLancamentoIsCalledWithCodigoThatExist_ThenItShouldBeRemovedSuccessfullyTest() {
+		doNothing().when(mockRepository).deleteById(anyLong());
+		
+		lancamentoResource.removerLancamento(1L);
 	}
 }

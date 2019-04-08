@@ -2,20 +2,20 @@ package com.anacleto.budgetcontrol.api.resource;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.when;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
-import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 import java.util.Arrays;
 import java.util.List;
+
+import javax.servlet.http.HttpServletResponse;
 
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -24,6 +24,7 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
@@ -43,6 +44,9 @@ public class PessoaResourceTest {
 	
 	@MockBean
 	private PessoaService mockService;
+	
+	@MockBean
+	private HttpServletResponse response;
 	
 	@Autowired
 	private MockMvc mockMvc;
@@ -85,9 +89,9 @@ public class PessoaResourceTest {
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isNotFound());
 	}
-	
+	/*
 	@Test
-	public void criarPessoaTest() throws Exception {
+	public void criarPessoa_withMockMvcTest() throws Exception {
 		when(mockRepository.save(any())).thenReturn(pessoaMock);
 		
 		this.mockMvc.perform(post("/pessoas")
@@ -96,34 +100,70 @@ public class PessoaResourceTest {
 						.andExpect(status().isCreated())
 						.andExpect(jsonPath("$.nome", is(pessoaMock.getNome())))
 						.andExpect(jsonPath("$.ativo", is(Boolean.TRUE)));
-	}
+	}*/
 	
 	@Test
-	public void removerPessoaTest() throws Exception {
+	public void criarPessoaTest() {
+		pessoaMock.setAtivo(false);
+		when(mockRepository.save(any())).thenReturn(pessoaMock);
+		
+		ResponseEntity<Pessoa> resp = pessoaResource.criarPessoa(pessoaMock, response);
+		
+		assertFalse(resp.getBody().getAtivo());
+	}
+	/*
+	@Test
+	public void removerPessoa_withMockMvcTest() throws Exception {
 		doNothing().when(mockRepository).deleteById(anyLong());
 		
 		this.mockMvc.perform(delete("/pessoas/{codigo}", anyLong())
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isNoContent());
-	}
+	} */
 	
 	@Test
-	public void atualizarPessoaTest() throws Exception {
+	public void removerPessoa_withMockMvcTest() {
+		doNothing().when(mockRepository).deleteById(anyLong());
+		
+		pessoaResource.removerPessoa(1L);
+	}
+	
+	/*
+	@Test
+	public void atualizarPessoa_withMockMvcTest() throws Exception {
 		when(mockService.atualizar(anyLong(), any())).thenReturn(pessoaMock);
 		
 		this.mockMvc.perform(put("/pessoas/{codigo}", anyLong(), any())
 						.content("{\"nome\" : \"Fulano\",\"ativo\" : \"false\"}")
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isOk());
-	} 
+	} */
 	
 	@Test
-	public void atualizarPropriedadeAtivoTest() throws Exception {
+	public void atualizarPessoaTest() {
+		when(mockService.atualizar(anyLong(), any())).thenReturn(pessoaMock);
+		
+		ResponseEntity<Pessoa> responseEntity = pessoaResource.atualizarPessoa(1L, pessoaMock);
+		
+		assertEquals("NomeTest", responseEntity.getBody().getNome());
+		assertTrue(responseEntity.getBody().getAtivo());
+	}
+	
+	/*
+	@Test
+	public void atualizarPropriedadeAtivo_withMockMvcTest() throws Exception {
 		doNothing().when(mockService).atualizarPropriedadeAtivo(anyLong(), any());
 		
 		this.mockMvc.perform(put("/pessoas/{codigo}/ativo", anyLong(), any())
 						.content("true")
 						.contentType(MediaType.APPLICATION_JSON))
 						.andExpect(status().isNoContent());
+	} */
+	
+	@Test
+	public void atualizarPropriedadeAtivoTest() {
+		doNothing().when(mockService).atualizarPropriedadeAtivo(anyLong(), any());
+		
+		pessoaResource.atualizarPropriedadeAtivo(1L, true);
 	}
 }
