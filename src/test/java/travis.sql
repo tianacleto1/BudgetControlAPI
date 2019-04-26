@@ -93,3 +93,5 @@ INSERT INTO lancamento (descricao, data_vencimento, data_pagamento, valor, obser
      VALUES ('Top Club', '2017-06-10', null, 120, null, 'RECEITA', 5, 3);
 INSERT INTO lancamento (descricao, data_vencimento, data_pagamento, valor, observacao, tipo, codigo_categoria, codigo_pessoa)
      VALUES ('CPFL', '2017-02-11', '2017-02-11', 110.44, 'Conta de Luz', 'DESPESA', 5, 4);
+INSERT INTO lancamento (descricao, data_vencimento, data_pagamento, valor, observacao, tipo, codigo_categoria, codigo_pessoa)
+     VALUES ('descricaoTest', '2017-02-09', '2017-02-09', 100.32, 'Conta de Luz', 'DESPESA', 5, 4);
